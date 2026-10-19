@@ -25,7 +25,7 @@ describe("ProductsController", () => {
   it("GET /products should return array of products", async () => {
     const result = await controller.getProducts();
     expect(Array.isArray(result)).toBe(true);
-    expect(result.length).toBeGreaterThanOrEqual(4);
+    expect(result.length).toBeGreaterThanOrEqual(999);
     expect(result[0].name).toBe("Cà phê sữa");
   });
 
