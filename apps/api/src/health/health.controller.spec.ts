@@ -1,7 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { HealthController } from './health.controller';
+import { Test, TestingModule } from "@nestjs/testing";
+import { HealthController } from "./health.controller";
 
-describe('HealthController', () => {
+describe("HealthController", () => {
   let controller: HealthController;
 
   beforeEach(async () => {
@@ -12,14 +12,14 @@ describe('HealthController', () => {
     controller = module.get<HealthController>(HealthController);
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return healthy status with ok', () => {
+  it("should return healthy status with ok", () => {
     const result = controller.check();
-    expect(result).toHaveProperty('status', 'ok');
-    expect(result).toHaveProperty('service', 'brewlite-api');
-    expect(result).toHaveProperty('timestamp');
+    expect(result).toHaveProperty("status", "ok");
+    expect(result).toHaveProperty("service", "brewlite-api");
+    expect(result).toHaveProperty("timestamp");
   });
 });

@@ -1,8 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { ProductResponseDto } from './dto/product-response.dto';
+import { Controller, Get, Param } from "@nestjs/common";
+import { ProductsService } from "./products.service";
+import { ProductResponseDto } from "./dto/product-response.dto";
 
-@Controller('products')
+@Controller("products")
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
@@ -19,8 +19,8 @@ export class ProductsController {
    * GET /products/:id
    * Lấy chi tiết sản phẩm, size và topping (FR-02)
    */
-  @Get(':id')
-  async getProductById(@Param('id') id: string): Promise<ProductResponseDto> {
+  @Get(":id")
+  async getProductById(@Param("id") id: string): Promise<ProductResponseDto> {
     return this.productsService.findById(id);
   }
 }

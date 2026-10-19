@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ProductsController } from './products.controller';
-import { ProductsService } from './products.service';
-import { NotFoundException } from '@nestjs/common';
+import { Test, TestingModule } from "@nestjs/testing";
+import { ProductsController } from "./products.controller";
+import { ProductsService } from "./products.service";
+import { NotFoundException } from "@nestjs/common";
 
-describe('ProductsController', () => {
+describe("ProductsController", () => {
   let controller: ProductsController;
   let service: ProductsService;
 
@@ -18,26 +18,26 @@ describe('ProductsController', () => {
     await service.resetSeed();
   });
 
-  it('should be defined', () => {
+  it("should be defined", () => {
     expect(controller).toBeDefined();
   });
 
-  it('GET /products should return array of products', async () => {
+  it("GET /products should return array of products", async () => {
     const result = await controller.getProducts();
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBeGreaterThanOrEqual(4);
-    expect(result[0].name).toBe('Cà phê sữa');
+    expect(result[0].name).toBe("Cà phê sữa");
   });
 
-  it('GET /products/:id should return single product if valid ID', async () => {
-    const result = await controller.getProductById('americano');
+  it("GET /products/:id should return single product if valid ID", async () => {
+    const result = await controller.getProductById("americano");
     expect(result).toBeDefined();
-    expect(result.id).toBe('americano');
+    expect(result.id).toBe("americano");
     expect(result.basePrice).toBe(40000);
   });
 
-  it('GET /products/:id should throw NotFoundException on invalid ID', async () => {
-    await expect(controller.getProductById('unknown-id')).rejects.toThrow(
+  it("GET /products/:id should throw NotFoundException on invalid ID", async () => {
+    await expect(controller.getProductById("unknown-id")).rejects.toThrow(
       NotFoundException,
     );
   });

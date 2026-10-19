@@ -20,14 +20,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install --legacy-peer-deps --no-audit
-          fi
+      - name: Install dependencies (clean)
+        run: npm ci
 
       - name: Lint check
         run: npm run lint
@@ -52,14 +49,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install --legacy-peer-deps --no-audit
-          fi
+      - name: Install dependencies (clean)
+        run: npm ci
 
       - name: Lint check
         run: npm run lint

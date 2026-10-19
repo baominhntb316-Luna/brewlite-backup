@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ProductResponseDto } from './dto/product-response.dto';
-import { SEED_PRODUCTS } from './seed/products.seed';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { ProductResponseDto } from "./dto/product-response.dto";
+import { SEED_PRODUCTS } from "./seed/products.seed";
 
 @Injectable()
 export class ProductsService {
@@ -20,7 +20,9 @@ export class ProductsService {
   async findById(id: string): Promise<ProductResponseDto> {
     const product = this.products.find((p) => p.id === id && p.isActive);
     if (!product) {
-      throw new NotFoundException(`Product with ID "${id}" not found or inactive`);
+      throw new NotFoundException(
+        `Product with ID "${id}" not found or inactive`,
+      );
     }
     return product;
   }

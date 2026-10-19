@@ -1,5 +1,5 @@
 export class ProductVariantDto {
-  size: 'S' | 'M' | 'L';
+  size: "S" | "M" | "L";
   priceDelta: number;
 }
 
