@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  web:
+    name: Web Quality Gate (Next.js)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install dependencies (clean)
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint
+
+      - name: Run unit & component tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
+
+  api:
+    name: API Quality Gate (NestJS)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install dependencies (clean)
+        run: npm ci
+
+      - name: Lint check
+        run: npm run lint
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run build
