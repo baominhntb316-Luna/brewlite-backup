@@ -1,0 +1,61 @@
+@startuml architecture
+title Sơ đồ Kiến trúc Phân lớp và Module Miền Nghiệp vụ (Layered & Modular Architecture)
+
+skinparam componentStyle uml2
+
+package "Tầng Trình Diễn (Presentation Layer)" {
+  [Trình duyệt Mobile / Desktop] as Browser
+  component "Next.js 14+ Frontend (apps/web)" as WebApp {
+    [Mobile-First Menu UI] as MenuUI
+    [Product Details & Options] as DetailUI
+    [Cart Store (Zustand/State)] as CartStore
+    [Checkout & Payment Page] as CheckoutUI
+    [Order History View] as HistoryUI
+  }
+}
+
+package "Tầng Ứng dụng & Miền Nghiệp vụ (NestJS Monolith - apps/api)" {
+  [Global ValidationPipe & Filters] as Pipes
+  [HealthModule (GET /health)] as HealthMod
+  [AuthModule (JWT & Bcrypt)] as AuthMod
+  [ProductsModule (Menu & Details)] as ProductsMod
+  [OrdersModule (State Machine & Logic)] as OrdersMod
+  [PaymentsModule (Idempotency Engine)] as PaymentsMod
+  [Loyalty & Promotion Service] as LoyaltyMod
+}
+
+package "Tầng Tích hợp Bên ngoài" {
+  component "Mock Payment Service" as MockGateway {
+    [Mô phỏng Ví điện tử (WALLET)]
+    [Mô phỏng Thẻ ngân hàng (CARD)]
+  }
+}
+
+package "Tầng Lưu trữ Bền vững (Persistence Layer)" {
+  database "PostgreSQL 16 Database" as DB {
+    [Bảng User & LoyaltyTransaction]
+    [Bảng Product, Variant & Topping]
+    [Bảng Order & OrderItem]
+    [Bảng Payment & Idempotency Key]
+  }
+  [Prisma ORM (Schema, Migration & Seed)] as Prisma
+}
+
+Browser --> WebApp : HTTPS
+WebApp --> Pipes : REST API / JSON + Bearer JWT
+
+Pipes --> HealthMod
+Pipes --> AuthMod
+Pipes --> ProductsMod
+Pipes --> OrdersMod
+Pipes --> PaymentsMod
+
+OrdersMod --> LoyaltyMod
+OrdersMod --> Prisma : DB Transaction (Atomic stock + order)
+PaymentsMod --> MockGateway : HTTPS REST (ngoài DB Transaction)
+PaymentsMod --> Prisma : Short Transaction (update payment + order)
+ProductsMod --> Prisma : Queries
+AuthMod --> Prisma : Queries
+
+Prisma --> DB : SQL Queries & Connection Pool
+@enduml
