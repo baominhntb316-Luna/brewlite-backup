@@ -43,7 +43,7 @@ export default function ProductModal({ product, onClose }: Props) {
         {/* Ảnh và nút đóng */}
         <div className="relative h-44 sm:h-56 bg-stone-100 shrink-0">
           <img
-            src={product.imageUrl}
+            src={product.imageUrl || product.image || '/ca-phe-sua.jpg'}
             alt={product.name}
             className="w-full h-full object-cover"
           />

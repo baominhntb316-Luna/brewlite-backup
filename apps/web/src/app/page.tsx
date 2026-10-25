@@ -145,7 +145,7 @@ export default function HomePage() {
               <div>
                 <div className="relative h-48 rounded-2xl overflow-hidden bg-stone-100">
                   <img
-                    src={product.imageUrl}
+                    src={product.imageUrl || product.image || '/ca-phe-sua.jpg'}
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
                   />

@@ -2,10 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 const FALLBACK_PRODUCTS = [
-  { id: 1, name: 'Cà phê sữa', price: 35000, description: 'Cà phê phin truyền thống đậm đà kết hợp sữa đặc ngọt béo.', category: 'COFFEE', image: '/ca-phe-sua.jpg', stock: 50, version: 1 },
-  { id: 2, name: 'Americano', price: 40000, description: 'Espresso pha loãng với nước nóng, giữ trọn hương vị nguyên bản.', category: 'COFFEE', image: '/americano.jpg', stock: 50, version: 1 },
-  { id: 3, name: 'Cappuccino', price: 45000, description: 'Espresso đậm vị hòa cùng sữa nóng và lớp bọt sữa bồng bềnh.', category: 'COFFEE', image: '/cappuccino.jpg', stock: 50, version: 1 },
-  { id: 4, name: 'Trà đào cam sả', price: 45000, description: 'Trà đào thanh mát kết hợp lát cam tươi mọng nước và hương sả.', category: 'TEA', image: '/tra-dao.jpg', stock: 50, version: 1 },
+  { id: 1, name: 'Cà phê sữa', price: 35000, description: 'Cà phê phin truyền thống đậm đà kết hợp sữa đặc ngọt béo.', category: 'COFFEE', image: '/ca-phe-sua.jpg', imageUrl: '/ca-phe-sua.jpg', stock: 50, version: 1 },
+  { id: 2, name: 'Americano', price: 40000, description: 'Espresso pha loãng với nước nóng, giữ trọn hương vị nguyên bản.', category: 'COFFEE', image: '/americano.jpg', imageUrl: '/americano.jpg', stock: 50, version: 1 },
+  { id: 3, name: 'Cappuccino', price: 45000, description: 'Espresso đậm vị hòa cùng sữa nóng và lớp bọt sữa bồng bềnh.', category: 'COFFEE', image: '/cappuccino.jpg', imageUrl: '/cappuccino.jpg', stock: 50, version: 1 },
+  { id: 4, name: 'Trà đào cam sả', price: 45000, description: 'Trà đào thanh mát kết hợp lát cam tươi mọng nước và hương sả.', category: 'TEA', image: '/tra-dao.jpg', imageUrl: '/tra-dao.jpg', stock: 50, version: 1 },
 ];
 
 @Injectable()

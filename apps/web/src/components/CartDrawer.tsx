@@ -48,7 +48,7 @@ export default function CartDrawer() {
                 className="flex gap-3.5 p-3.5 rounded-2xl bg-stone-50 border border-stone-100"
               >
                 <img
-                  src={item.product.imageUrl}
+                  src={item.product.imageUrl || item.product.image || '/ca-phe-sua.jpg'}
                   alt={item.product.name}
                   className="w-16 h-16 rounded-xl object-cover shrink-0"
                 />
