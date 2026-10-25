@@ -1,241 +1,143 @@
-# BrewLite – Cashless Coffee Ordering System
+# ☕ BrewLite - Ứng dụng Đặt Cà Phê Không Tiền Mặt
 
-[![CI Quality Gate](https://github.com/baominhntb316-Luna/brewlite/actions/workflows/ci.yml/badge.svg)](https://github.com/baominhntb316-Luna/brewlite/actions/workflows/ci.yml)
-![Node](https://img.shields.io/badge/node-%3E%3D22.0.0-green.svg)
-![TypeScript](https://img.shields.io/badge/typescript-5.x-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14%2B-black.svg)
-![NestJS](https://img.shields.io/badge/NestJS-10%2B-red.svg)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue.svg)
-![Docker](https://img.shields.io/badge/docker-compose-blue.svg)
-
-> **Môn học**: Công nghệ Phần mềm  
-> **Học kỳ**: I – Năm học 2026–2027  
-> **Đơn vị**: Khoa Công nghệ Thông tin – Trường Đại học Sài Gòn  
-> **Đồ án**: Bài tập lớn Assignment 2 – Requirements to Deployment (VER 1.0)
+> **Bài tập lớn môn Công nghệ Phần mềm (Software Engineering)**  
+> **Trường Đại học Sài Gòn (SGU) - Khoa Công nghệ Thông tin**  
+> **Học kỳ I - Năm học 2026–2027**
 
 ---
 
-## 1. Tổng quan dự án
-
-BrewLite là ứng dụng web đặt cà phê và đồ uống không dùng tiền mặt, thiết kế theo định hướng mobile-first/PWA, giúp khách hàng xem thực đơn, tùy chỉnh size/topping, quản lý giỏ hàng, đặt hàng và thanh toán nhanh chóng chỉ qua vài thao tác chạm trên điện thoại di động.
-
-### Luồng nghiệp vụ cốt lõi (End-to-End Flow)
-```
-Xem menu ──> Chọn tùy chọn (Size/Topping) ──> Giỏ hàng ──> Đăng nhập / Đặt đơn ──> Thanh toán mock (Ví/Thẻ) ──> Theo dõi đơn & Lịch sử
-```
-
-### Công nghệ cốt lõi
-- **Frontend**: Next.js 14+ (App Router, React, TypeScript), Tailwind CSS, Mobile-first UI & PWA-ready.
-- **Backend**: NestJS (TypeScript), kiến trúc Modular Monolith phân tầng (Domain-driven modules), `class-validator`, Passport JWT.
-- **Cơ sở dữ liệu**: PostgreSQL 16, Prisma ORM với Migration và Seed dữ liệu chuẩn.
-- **Thanh toán mô phỏng**: Mock Payment Service (hỗ trợ kiểm thử trạng thái SUCCESS, FAILURE, TIMEOUT và cơ chế Idempotency chống lặp giao dịch).
-- **CI/CD & DevOps**: GitHub Actions, Docker Compose, GHCR (GitHub Packages), Caddy Reverse Proxy (HTTPS/TLS tự động).
+## 1. Giới thiệu Sản phẩm (Product Vision)
+**BrewLite** giúp khách hàng đặt và thanh toán đồ uống không dùng tiền mặt chỉ trong vài chạm, giảm thời gian xếp hàng và nhận đơn nhanh tại quầy. Dự án được phát triển theo quy trình **Agile Scrum** trải dài qua 3 Sprint, hoàn thành trọn vẹn 10/10 hạng mục trong Product Backlog.
 
 ---
 
-## 2. Cấu trúc thư mục Monorepo
+## 2. Kiến trúc & Công nghệ Sử dụng
 
-```
+| Thành phần | Công nghệ |
+| :--- | :--- |
+| **Frontend** | Next.js (React, TypeScript), TailwindCSS, Zustand (Quản lý giỏ hàng) |
+| **Backend** | NestJS (TypeScript), REST API, `class-validator`, JWT (`@nestjs/passport`), `bcrypt` |
+| **Cơ sở dữ liệu** | PostgreSQL 15 + Prisma ORM |
+| **Thanh toán** | Mock Payment Gateway (Mô phỏng thanh toán Ví điện tử / Thẻ ngân hàng có hỗ trợ Idempotency) |
+| **DevOps & Testing** | Docker, Docker Compose, Jest (Unit & Integration Testing) |
+
+### Cấu trúc thư mục dự án
+```text
 brewlite/
-├── apps/
-│   ├── web/                         # Next.js frontend (mobile-first / PWA)
-│   │   ├── app/                     # Next.js App Router (Menu, Cart, Checkout)
-│   │   ├── components/              # UI components (ProductCard, Skeleton, Error, Empty)
-│   │   ├── types/                   # TypeScript interfaces / DTOs
-│   │   └── __tests__/               # Unit & Component tests
-│   └── api/                         # NestJS REST API backend
-│       ├── src/
-│       │   ├── health/              # Health check module (GET /health)
-│       │   ├── products/            # Products domain module (GET /products, GET /products/:id)
-│       │   │   ├── dto/             # Request / Response validation DTOs
-│       │   │   └── seed/            # Seed data tái tạo menu mẫu
-│       │   ├── app.module.ts        # Root module
-│       │   └── main.ts              # Entrypoint (CORS, ValidationPipe, Global filters)
-│       └── test/                    # Unit tests & API spec
-├── docs/                            # Tài liệu kỹ thuật bắt buộc theo thứ tự cổng nghiệm thu
-│   ├── requirements/                # Task 1: Bối cảnh, SRS (FR/NFR), Use Case (UC-05)
-│   ├── diagrams/                    # Task 2 & 3: File nguồn .puml & bản xuất SVG
-│   │   └── exports/                 # Bản xuất SVG chính thức của các sơ đồ
-│   ├── architecture/                # Task 3: Mô tả kiến trúc và các bản ghi quyết định ADR
-│   │   └── adr/                     # ADR-001 đến ADR-004
-│   ├── traceability-matrix.md       # Task 7 & Task 8: Ma trận truy vết yêu cầu (Traceability)
-│   └── deployment.md                # Task 3.2 & Task 5: Kế hoạch triển khai & vận hành
-├── tests/                           # Integration & End-to-End tests
-│   ├── integration/
-│   └── e2e/
-├── .github/workflows/               # Task 4.4 & Task 5.3: Pipeline CI và CD tự động
-│   ├── ci.yml                       # CI Quality Gate (Install -> Lint -> Test -> Build)
-│   └── cd.yml                       # CD Deployment pipeline
-├── docker-compose.yml               # Cấu hình container local (Web, API, PostgreSQL)
-├── .env.example                     # Mẫu biến môi trường (không chứa secret thật)
-├── .gitignore                       # Loại trừ node_modules, build artifacts, secrets
-└── README.md                        # Tài liệu hướng dẫn sử dụng và kiểm thử
+├── backend/            # Mã nguồn REST API (NestJS + Prisma)
+├── frontend/           # Mã nguồn Giao diện người dùng (Next.js + TailwindCSS)
+├── docker-compose.yml  # Cấu hình chạy đồng thời Frontend, Backend và PostgreSQL
+├── api-test.http       # Kịch bản kiểm thử nhanh REST API trên VS Code
+└── README.md           # Tài liệu hướng dẫn cài đặt và bàn giao
 ```
 
 ---
 
-## 3. Yêu cầu môi trường & Cài đặt
+## 3. Hướng dẫn Cài đặt & Khởi chạy
 
-### Yêu cầu tiên quyết
-- **Node.js**: Phiên bản `>= 20.0.0` (khuyến nghị Node.js 22 LTS).
-- **npm**: Phiên bản `>= 10.0.0`.
-- **Docker & Docker Compose** (nếu chạy qua container).
-- **Git**: `>= 2.40.0`.
+### Cách 1: Chạy toàn bộ hệ thống bằng Docker Compose (Khuyên dùng khi Demo)
+Đảm bảo máy đã cài đặt **Docker Desktop**. Tại thư mục gốc của dự án, chạy lệnh:
 
-### Cấu hình biến môi trường
-Tạo file `.env` từ file mẫu `.env.example`:
 ```bash
-# Tại thư mục gốc của repository
-cp .env.example .env
+docker compose up --build -d
 ```
+* **Frontend (Next.js)**: Truy cập tại `http://localhost:3000`
+* **Backend API (NestJS)**: Hoạt động tại `http://localhost:3001`
+* **PostgreSQL DB**: Hoạt động tại cổng `5432` (Tự động migrate schema và seed 4 món đồ uống mẫu khi khởi động).
 
-Nội dung cấu hình mẫu trong `.env`:
-| Tên biến | Mục đích | Giá trị mặc định (Local) |
-|---|---|---|
-| `NODE_ENV` | Môi trường thực thi | `development` |
-| `API_PORT` | Cổng dịch vụ NestJS | `3001` |
-| `JWT_SECRET` | Khóa bí mật ký mã token | `replace-with-local-dev-secret-at-least-32-chars` |
-| `JWT_EXPIRES_IN` | Thời gian sống token | `1h` |
-| `PAYMENT_MOCK_MODE` | Chế độ giả lập thanh toán | `success` (hoặc `failure`) |
-| `POSTGRES_DB` | Tên cơ sở dữ liệu | `brewlite` |
-| `POSTGRES_USER` | Tên người dùng CSDL | `brewlite` |
-| `POSTGRES_PASSWORD`| Mật khẩu CSDL | `replace-local-password` |
-| `DATABASE_URL` | Chuỗi kết nối DB | `postgresql://brewlite:replace-local-password@localhost:5432/brewlite?schema=public` |
-| `NEXT_PUBLIC_API_BASE_URL` | Base URL gọi API từ browser | `http://localhost:3001` |
-
----
-
-## 4. Hướng dẫn khởi chạy
-
-### Cách 1: Khởi chạy trực tiếp (Local Development)
-
-#### Bước 1: Khởi chạy Backend API (NestJS)
-```bash
-cd apps/api
-npm install
-npm run start:dev
-```
-Backend API sẽ khởi động tại: `http://localhost:3001`  
-Kiểm tra Health check: `http://localhost:3001/health`  
-Kiểm tra danh sách Menu: `http://localhost:3001/products`
-
-#### Bước 2: Khởi chạy Frontend Web (Next.js)
-```bash
-cd apps/web
-npm install
-npm run dev
-```
-Giao diện ứng dụng sẽ sẵn sàng tại: `http://localhost:3000`
-
----
-
-### Cách 2: Khởi chạy toàn bộ hệ thống bằng Docker Compose
-
-Chỉ cần một câu lệnh duy nhất tại thư mục gốc để khởi động CSDL PostgreSQL, API và Frontend Web:
-```bash
-docker compose up --build
-```
-Dịch vụ sẽ tự động chờ DB healthy trước khi khởi chạy API, và API healthy trước khi khởi chạy Web:
-- **Web Client**: `http://localhost:3000`
-- **REST API**: `http://localhost:3001`
-- **Health Check**: `http://localhost:3001/health`
-
-Dừng hệ thống:
+Để dừng hệ thống:
 ```bash
 docker compose down
 ```
 
 ---
 
-## 5. Quy trình Kiểm thử (Testing) & Quality Gate
+### Cách 2: Chạy môi trường Phát triển (Local Development trên VS Code)
 
-Dự án áp dụng quy chuẩn kiểm thử nghiêm ngặt tại cả 2 tầng Frontend và Backend:
+#### Bước 1: Thiết lập Biến môi trường chung (Root .env)
+Toàn bộ dự án sử dụng **duy nhất một file `.env` tại thư mục gốc**:
+```bash
+cp .env.example .env
+```
+*(Không cần tạo file `.env` riêng lẻ trong từng thư mục `apps/api` hay `apps/web`)*
 
-### Chạy kiểm thử cho Backend API (`apps/api`):
+> ⚠️ **LƯU Ý QUAN TRỌNG VỀ BIẾN `NEXT_PUBLIC_USE_MOCK` (Phụ lục B - D-07):**
+> * Khi `NEXT_PUBLIC_USE_MOCK=true`, Frontend hoàn toàn tách biệt khỏi Backend, sử dụng dữ liệu mẫu và lưu trữ trạng thái đơn hàng tạm thời trong `localStorage`. Chế độ này **chỉ phục vụ mục đích kiểm thử/demo giao diện người dùng**.
+> * **Khi nghiệm thu luồng nghiệp vụ thực tế** (bao gồm kiểm thử State Machine, Concurrency Optimistic Locking, Thanh toán Idempotent và xác thực JWT qua PostgreSQL), bắt buộc phải cấu hình `NEXT_PUBLIC_USE_MOCK=false`.
+
+#### Bước 2: Khởi chạy Database
+```bash
+docker compose up postgres -d
+```
+
+#### Bước 3: Khởi chạy Backend API (`Port 3001`)
 ```bash
 cd apps/api
-npm run lint          # Kiểm tra chuẩn cú pháp ESLint
-npm test              # Chạy toàn bộ Unit tests cho Controller, Service, Health
-npm run build         # Biên dịch mã nguồn TypeScript sang dist/
+npm install
+npm run db:push
+npm run db:seed
+npm run start:dev
 ```
 
-### Chạy kiểm thử cho Frontend Web (`apps/web`):
+#### Bước 4: Khởi chạy Frontend Web (`Port 3000`)
 ```bash
 cd apps/web
-npm run lint          # Kiểm tra cú pháp Next.js / React
-npm test              # Chạy component tests (Loading, Empty, Error, Product render)
-npm run build         # Build production bundle (.next)
+npm install
+npm run dev
 ```
 
 ---
 
-## 6. API Endpoints cốt lõi (Sprint 1 MVP)
+## 4. Danh sách REST API Endpoints Chính
 
-| Phương thức | Đường dẫn | Phân quyền | Mô tả chức năng |
-|---|---|---|---|
-| `GET` | `/health` | Public | Kiểm tra trạng thái hoạt động của hệ thống (liveness check) |
-| `GET` | `/products` | Public | Lấy danh sách sản phẩm đồ uống đang active (có id, name, price, stock, variants, toppings) |
-| `GET` | `/products/:id` | Public | Lấy thông tin chi tiết một sản phẩm đồ uống (trả về 404 nếu không tìm thấy) |
+| Phương thức | Endpoint | Quyền | Mô tả chức năng |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/products` | Public | Lấy danh sách toàn bộ đồ uống trong menu |
+| `GET` | `/products/:id` | Public | Xem chi tiết một sản phẩm và số lượng tồn kho |
+| `POST` | `/auth/register` | Public | Đăng ký tài khoản mới (băm mật khẩu với `bcrypt`) |
+| `POST` | `/auth/login` | Public | Đăng nhập và nhận chuỗi `accessToken` (JWT) |
+| `POST` | `/orders` | `JWT Guard` | Tạo đơn hàng ở trạng thái `PENDING`, kiểm soát tồn kho & áp mã giảm giá |
+| `POST` | `/payments` | `JWT Guard` | Thanh toán không tiền mặt kèm header `Idempotency-Key` |
+| `GET` | `/orders/me` | `JWT Guard` | Xem lịch sử đơn hàng và trạng thái đơn của người dùng hiện tại |
+| `PATCH` | `/orders/:id/status` | `JWT Guard` | Chuyển trạng thái đơn hàng theo Order State Machine |
 
-### Dữ liệu mẫu (Sample Response `GET /products`):
-```json
-[
-  {
-    "id": "coffee-milk",
-    "name": "Cà phê sữa",
-    "basePrice": 35000,
-    "imageUrl": "/images/coffee-milk.jpg",
-    "stock": 25,
-    "isActive": true,
-    "variants": [
-      { "size": "S", "priceDelta": 0 },
-      { "size": "M", "priceDelta": 6000 },
-      { "size": "L", "priceDelta": 10000 }
-    ],
-    "toppings": [
-      { "id": "pearl", "name": "Trân châu đen", "extraPrice": 5000 },
-      { "id": "cheese-foam", "name": "Kem phô mai", "extraPrice": 8000 }
-    ]
-  }
-]
+---
+
+## 5. Điểm nhấn Nghiệp vụ Backend Nâng cao (Task 10)
+
+Hệ thống hiện thực đầy đủ 4 yêu cầu nghiệp vụ thực tế tại tầng Backend:
+
+1. **Order State Machine (`src/orders/order-state-machine.ts`)**:
+   * Luồng chuẩn: `PENDING` $\rightarrow$ `PAID` $\rightarrow$ `PREPARING` $\rightarrow$ `READY` $\rightarrow$ `COMPLETED`.
+   * Luồng ngoại lệ: Hỗ trợ chuyển sang `PAYMENT_FAILED` (cho phép thử lại về `PENDING`) và `CANCELLED`.
+   * Hàm `assertTransition(from, to)` chặn mọi thao tác nhảy cóc trạng thái không hợp lệ.
+2. **Thanh toán Idempotent (`src/payments/payments.service.ts`)**:
+   * Bắt buộc truyền `Idempotency-Key` trên Header. Nếu client gửi trùng request thanh toán nhiều lần do lỗi mạng, hệ thống trả về kết quả đã xử lý trước đó mà không tạo giao dịch mới hay trừ tiền/cộng điểm 2 lần.
+3. **Kiểm soát Tồn kho khi Đặt đồng thời (`src/orders/orders.service.ts`)**:
+   * Kết hợp Database Transaction (`prisma.$transaction`) và **Optimistic Locking** (thông qua trường `version` của `Product`). Đảm bảo không bao giờ xảy ra tình trạng bán lố số lượng tồn kho (overselling) khi nhiều khách hàng bấm đặt cùng một thời điểm.
+4. **Khuyến mãi & Tích điểm Loyalty**:
+   * Hỗ trợ áp mã giảm giá (`BREWLITE10` giảm 10%, `GIAM10K` giảm 10.000đ) khi tạo đơn.
+   * Tự động cộng điểm tích lũy (`loyaltyPoints`) cho khách hàng theo tỷ lệ `10.000đ = 1 điểm` ngay khi đơn hàng chuyển sang trạng thái `PAID`.
+
+### Chạy bộ Unit & Integration Test kiểm chứng Task 10
+Để chạy file kiểm thử tự động chứng minh cả 3 tiêu chí chấm điểm `(a) State Machine`, `(b) Idempotency`, và `(c) Concurrency Optimistic Locking`:
+
+```bash
+cd backend
+npx jest test/task10.spec.ts
 ```
 
 ---
 
-## 7. Quy chuẩn Git & Tiêu chí hoàn thành (Definition of Done)
+## 6. Trạng thái Hoàn thành Product Backlog (Definition of Done)
 
-### Quy ước Branch & Pull Request
-- Nhánh chính `main` được bảo vệ (Protected Branch). Tuyệt đối không commit trực tiếp lên `main`.
-- Quy chuẩn nhánh tính năng: `feature/<issue-id>-<short-description>`, ví dụ: `feature/TASK-03-menu-page`.
-- Quy chuẩn nhánh sửa lỗi: `fix/<issue-id>-<short-description>`.
-- Mỗi Pull Request bắt buộc phải:
-  1. Vượt qua 100% Quality Gate của CI (Install, Lint, Unit Test, Build).
-  2. Được ít nhất 1 thành viên trong nhóm rà soát (Code Review) và phê duyệt (Approve).
-  3. Mô tả rõ phạm vi thay đổi và đính kèm bằng chứng kiểm thử.
-
-### Quy ước Commit (Conventional Commits)
-- `feat(scope)`: Thêm tính năng mới (vd: `feat(api): add products module`).
-- `fix(scope)`: Sửa lỗi (vd: `fix(web): handle image fallback on error`).
-- `test(scope)`: Bổ sung hoặc cập nhật kiểm thử (vd: `test(api): add products service unit test`).
-- `docs(scope)`: Cập nhật tài liệu kỹ thuật, sơ đồ (vd: `docs(srs): add acceptance criteria for FR-01`).
-- `ci(scope)`: Cập nhật cấu hình CI/CD (vd: `ci(github): add matrix check for web and api`).
-- `chore(scope)`: Cấu hình dependencies, công cụ (vd: `chore(deps): update nextjs to 14.2`).
-
-### Tiêu chuẩn hoàn thành (Definition of Done - DoD)
-Một task hoặc User Story chỉ được chuyển sang trạng thái **Done** khi:
-1. Mã nguồn build thành công, không phát sinh lỗi Lint hoặc Compile.
-2. Đã viết kiểm thử tự động (Unit / Component test) và tất cả test đều PASS.
-3. Đáp ứng 100% Tiêu chí chấp nhận (Acceptance Criteria) đã thỏa thuận trong Backlog.
-4. Giao diện người dùng xử lý đầy đủ 3 trạng thái: **Loading**, **Empty** và **Error**.
-5. Tài liệu liên quan (SRS, Diagrams, Ma trận truy vết) được cập nhật đồng bộ trong cùng PR.
-6. PR được review và merge vào `main` sau khi CI kiểm tra đạt kết quả XANH.
-
----
-
-## 8. Thông tin Bàn giao & Triển khai Production
-
-- **URL Web Production**: `https://brewlite.example.com` *(được cấu hình qua reverse proxy Caddy HTTPS)*
-- **URL API Production**: `https://brewlite.example.com/api`
-- **URL Health check**: `https://brewlite.example.com/health`
-- **Container Registry**: GitHub Container Registry (`ghcr.io`)
-- **Kho lưu trữ chính thức**: [https://github.com/baominhntb316-Luna/brewlite](https://github.com/baominhntb316-Luna/brewlite)
+- [x] **Task 1**: Khởi tạo dự án monorepo (`frontend` + `backend`), cấu hình Git, `.env.example`, `README.md`.
+- [x] **Task 2**: API `GET /products` và `GET /products/:id` trả về danh sách menu từ PostgreSQL.
+- [x] **Task 3**: Trang Menu (Frontend) hiển thị lưới sản phẩm, xử lý trạng thái loading/empty.
+- [x] **Task 4**: Màn hình chi tiết sản phẩm, tùy chọn Size (`S`/`M`/`L`) và Topping, tự động tính giá.
+- [x] **Task 5**: Quản lý Giỏ hàng (Thêm/sửa số lượng/xóa, tự tính tổng tiền, hiển thị badge số lượng).
+- [x] **Task 6**: API `POST /orders` validate dữ liệu với `class-validator`, lưu đơn trạng thái `PENDING`.
+- [x] **Task 7**: Đăng ký / Đăng nhập (`bcrypt` + `JWT`), bảo vệ route đặt đơn và thanh toán bằng Guard.
+- [x] **Task 8**: Tích hợp Mock Payment (`POST /payments`), chuyển trạng thái `PAID` hoặc `PAYMENT_FAILED`.
+- [x] **Task 9**: Màn hình xác nhận đơn, API `GET /orders/me`, đóng gói `docker-compose.yml` chạy trọn bộ 3 dịch vụ.
+- [x] **Task 10**: Hoàn thiện State Machine, Idempotent Payment, Optimistic Locking, Loyalty & vượt qua toàn bộ Test Suite.

@@ -1,48 +1,34 @@
-# BrewLite – Ma Trận Truy Vết Bắt Buộc (Traceability Matrix)
+# Ma trận Truy vết Yêu cầu Phần mềm (Traceability Matrix - Mục 8.1)
 
-> **Mã tạo phẩm**: DOC-TRACE-01  
-> **Căn cứ**: Đề bài Assignment 2 – Mục 7 & Mục 8.1  
-> **Quy tắc**: Mỗi mã yêu cầu phải được ánh xạ trực tiếp và kiểm chứng được từ Ca sử dụng -> Bản vẽ thiết kế/Sơ đồ -> File Mã nguồn/API -> File Kiểm thử tự động thực tế.
-
----
-
-## 1. Bảng Truy Vết Yêu Cầu Chức Năng (Functional Requirements Traceability)
-
-| Mã yêu cầu | Tên yêu cầu / User Story | Thiết kế / Sơ đồ liên quan | File Code / API triển khai | File Kiểm thử / Minh chứng | Trạng thái |
-|---|---|---|---|---|:---:|
-| **FR-01** | US-01 Xem menu sản phẩm | `activity-end-to-end.puml`<br>`usecase-overview.puml` | `GET /products`<br>`apps/api/src/products/products.controller.ts`<br>`apps/web/app/page.tsx` | `apps/api/src/products/products.service.spec.ts`<br>`apps/web/__tests__/menu.spec.tsx` | **Done (Sprint 1)** |
-| **FR-02** | US-02 Xem chi tiết & tùy chọn món | `class-domain.puml`<br>`usecase-checkout.puml` | `GET /products/:id`<br>`apps/api/src/products/products.controller.ts` | `apps/api/src/products/products.controller.spec.ts` | **Done (Sprint 1)** |
-| **FR-03** | US-03 Quản lý giỏ hàng | `activity-end-to-end.puml`<br>`usecase-checkout.puml` | `apps/web/types/product.ts`<br>`Cart Store (Zustand/State)` | `apps/web/__tests__/menu.spec.tsx` | **In Progress (Sprint 2)** |
-| **FR-04** | US-04 Đăng ký tài khoản | `sequence-checkout.puml`<br>`usecase-overview.puml` | `POST /auth/register`<br>`apps/api/src/auth/auth.service.ts` | `tests/integration/auth.spec.ts` | **Sprint 2** |
-| **FR-05** | US-05 Đăng nhập & cấp JWT | `sequence-checkout.puml`<br>`usecase-checkout.puml` | `POST /auth/login`<br>`apps/api/src/auth/jwt.strategy.ts` | `tests/integration/auth.spec.ts` | **Sprint 2** |
-| **FR-06** | UC-05 Tạo đơn hàng PENDING | `activity-end-to-end.puml`<br>`sequence-checkout.puml`<br>`class-domain.puml` | `POST /orders`<br>`apps/api/src/orders/orders.service.ts` | `tests/integration/orders-create.spec.ts` | **Sprint 2** |
-| **FR-07** | UC-05 Thanh toán mock Ví/Thẻ | `sequence-checkout.puml`<br>`order-state-machine.puml` | `POST /payments`<br>`apps/api/src/payments/payments.service.ts` | `tests/integration/payments-mock.spec.ts` | **Sprint 2** |
-| **FR-08** | UC-05 Chống lặp thanh toán | `sequence-checkout.puml`<br>`ADR-003` | `apps/api/src/payments/payments.service.ts` (Idempotency Engine) | `tests/integration/payments-idempotency.spec.ts` | **Sprint 2** |
-| **FR-09** | US-06 Màn hình xác nhận đơn | `activity-end-to-end.puml`<br>`sequence-checkout.puml` | `apps/web/app/order-confirmation/page.tsx` | `tests/e2e/menu-flow.spec.ts` | **Sprint 2** |
-| **FR-10** | US-07 Lịch sử đơn hàng | `usecase-overview.puml`<br>`sequence-checkout.puml` | `GET /orders/me`<br>`apps/api/src/orders/orders.controller.ts` | `tests/integration/orders-history.spec.ts` | **Sprint 2** |
-| **FR-11** | US-08 Theo dõi trạng thái đơn | `order-state-machine.puml`<br>`class-domain.puml` | `GET /orders/:id`<br>`apps/api/src/orders/orders.controller.ts` | `apps/api/src/orders/state-machine.spec.ts` | **Sprint 2** |
-| **FR-12** | US-09 Chuyển trạng thái đơn | `order-state-machine.puml`<br>`class-domain.puml` | `POST /orders/:id/transitions`<br>`RolesGuard` | `apps/api/src/orders/state-machine.spec.ts` | **Sprint 2** |
-| **FR-13** | UC-05 Kiểm soát tồn kho đồng thời | `activity-end-to-end.puml`<br>`ADR-004` | `apps/api/src/orders/orders.service.ts` (Atomic UPDATE) | `tests/integration/orders-concurrency.spec.ts` | **Sprint 2** |
-| **FR-14** | US-10 Áp dụng mã khuyến mãi | `class-domain.puml`<br>`ADR-002` | `apps/api/src/promotions/promotions.service.ts` | `tests/integration/promotions.spec.ts` | **Sprint 2** |
-| **FR-15** | US-11 Điểm thưởng duy nhất | `sequence-checkout.puml`<br>`class-domain.puml` | `apps/api/src/loyalty/loyalty.service.ts` (Unique orderId) | `tests/integration/loyalty.spec.ts` | **Sprint 2** |
-| **FR-16** | US-Ops Kiểm tra sức khỏe | `architecture.puml`<br>`deployment.puml` | `GET /health`<br>`apps/api/src/health/health.controller.ts` | `apps/api/src/health/health.controller.spec.ts` | **Done (Sprint 1)** |
-| **FR-17** | UC-05 Thử lại thanh toán lỗi | `activity-end-to-end.puml`<br>`order-state-machine.puml` | `POST /payments` (Retry attempt)<br>`apps/web/components/ErrorState.tsx` | `tests/integration/payments-retry.spec.ts` | **Sprint 2** |
+* **Dự án**: Hệ thống Đặt đồ uống trực tuyến BrewLite
+* **Môn học**: Công nghệ Phần mềm – Đại học Sài Gòn
+* **Phiên bản**: v2.0.0 (Assignment 2)
+* **Tổng hợp**: Nhóm Kỹ thuật BrewLite
 
 ---
 
-## 2. Bảng Truy Vết Yêu Cầu Phi Chức Năng (Non-Functional Requirements Traceability)
+## Bảng Ma trận Truy vết Yêu cầu Chức năng (Functional Requirements - FR)
 
-| Mã yêu cầu | Nhóm yêu cầu | Thiết kế / Căn cứ | Triển khai trong Code & Cấu hình | Minh chứng kiểm thử & Đánh giá | Trạng thái |
-|---|---|---|---|---|:---:|
-| **NFR-01** | Hiệu năng (< 500ms) | SRS Mục 2.2.2 | Tối ưu hóa truy vấn DB, Connection Pool | Đo đạc thời gian phản hồi p95 qua Jest / Postman (< 120ms) | **Đạt** |
-| **NFR-02** | An toàn xác thực | SRS & ADR-002 | `apps/api/src/auth/` (Bcrypt, JWT HS256) | `tests/integration/auth.spec.ts` | **Sprint 2** |
-| **NFR-03** | Kiểm tra dữ liệu đầu vào | SRS Mục 2.2.2 | `ValidationPipe(whitelist: true)` trong `main.ts` | Unit tests từ chối payload sai kiểu / thừa trường | **Đạt** |
-| **NFR-04** | Nhất quán dữ liệu | ADR-003, ADR-004 | PostgreSQL Prisma Transactions, UUID keys | `tests/integration/orders-create.spec.ts` | **Sprint 2** |
-| **NFR-05** | Tính khả dụng giao diện | SRS Mục 2.2.2 | `apps/web/app/page.tsx` (Mobile-First, Skeleton, Error, Empty) | `apps/web/__tests__/menu.spec.tsx` | **Đạt (Sprint 1)** |
-| **NFR-06** | Tương thích trình duyệt | SRS Mục 2.2.2 | CSS Flex/Grid chuẩn, Tailwind CSS | Kiểm thử thành công trên Chrome, Firefox và Safari | **Đạt** |
-| **NFR-07** | Triển khai tái tạo được | `deployment.md` | `docker-compose.yml`, `.env.example`, `README.md` | Lệnh `docker compose up --build` khởi động thành công | **Đạt (Sprint 1)** |
-| **NFR-08** | CI Quality Gate | Đề bài Mục 5.4 | `.github/workflows/ci.yml` (Install->Lint->Test->Build) | Bằng chứng CI Pass run và Controlled Fail run | **Đạt (Sprint 1)** |
-| **NFR-09** | Quan sát hệ thống | `deployment.md` | `GET /health`, Logging ra stdout/stderr | `apps/api/src/health/health.controller.spec.ts` | **Đạt (Sprint 1)** |
-| **NFR-10** | Bảo vệ DB Production | `deployment.md` | PostgreSQL nằm trong Docker private network, persistent volume | Kiểm tra cổng 5432 không expose ra ngoài host | **Đạt (Sprint 1)** |
-| **NFR-11** | Khả năng bảo trì | ADR-001, ADR-002 | Kiến trúc NestJS Modular Monolith, DTO rõ ràng | Đạt tiêu chuẩn cấu trúc mã nguồn Clean Code | **Đạt (Sprint 1)** |
-| **NFR-12** | Mobile-First / PWA | SRS Mục 2.2.2 | Next.js viewport meta, responsive Tailwind layout | Thao tác mượt mà trên màn hình di động 360px+ | **Đạt (Sprint 1)** |
+| Mã Yêu Cầu | Use-case / User Story | Thiết kế & Sơ đồ (UML Diagrams) | Thành phần Mã nguồn & API | Bài Kiểm thử Tương ứng (Test Suite) | Thành viên Phụ trách |
+| :---: | :--- | :--- | :--- | :--- | :---: |
+| **FR-01** | **US-01 / UC-01**: Khám phá danh mục Menu & Chi tiết đồ uống | • `activity-menu.puml`<br>• `sequence-menu.puml`<br>• `class-domain.puml` | • `GET /products`<br>• `GET /products/:id`<br>• `ProductsService.findAll()`<br>• `apps/web/src/app/page.tsx` | • Unit test Products<br>• E2E: `checkout-e2e.spec.ts` (Chặng 1) | Nhung (TV2) |
+| **FR-02** | **US-02 / UC-02**: Tùy chọn kích cỡ (Size S/M/L) và Topping | • `activity-cart.puml`<br>• `class-domain.puml` | • `ProductModal.tsx`<br>• Tính giá theo Size & Topping (+5.000đ/topping) | • Frontend component tests<br>• E2E: `checkout-e2e.spec.ts` | Tuyết Vy (TV1) |
+| **FR-03** | **US-03 / UC-02**: Quản lý Giỏ hàng (Thêm/Sửa/Xóa, badge số lượng) | • `activity-cart.puml`<br>• `sequence-cart.puml` | • `useCartStore.ts` (Zustand)<br>• `CartDrawer.tsx`<br>• Tự tính tổng tiền đơn hàng | • Zustand store tests<br>• Frontend render test | Tuyết Vy (TV1) |
+| **FR-04** | **US-04 / UC-03**: Xác thực người dùng (Đăng ký, Đăng nhập, JWT) | • `activity-auth.puml`<br>• `sequence-auth.puml`<br>• `ADR 002-database-prisma` | • `POST /auth/register`<br>• `POST /auth/login`<br>• `JwtStrategy`, `JwtAuthGuard` | • Unit test Auth service<br>• Bcrypt hashing test | Hasan (TV3) |
+| **FR-05** | **US-05 / UC-04**: Tạo đơn hàng & Khóa tồn kho đồng thời (Concurrency) | • `activity-end-to-end.puml`<br>• `sequence-order-create.puml`<br>• `ADR 003` | • `POST /orders`<br>• `OrdersService.createOrder()`<br>• Transaction + Optimistic Locking | • Test Concurrency (Tiêu chí c trong `task10.spec.ts`)<br>• `checkout-e2e.spec.ts` | An (TV4) |
+| **FR-06** | **US-06 / UC-05**: Thanh toán Không tiền mặt (Ví điện tử / Thẻ ngân hàng) | • `sequence-checkout.puml`<br>• `activity-payment.puml`<br>• `ADR 003` | • `POST /payments`<br>• `PaymentsService.processPayment()`<br>• Mock Payment Gateway | • Integration Test Payment<br>• E2E: `checkout-e2e.spec.ts` (Chặng 3) | **San (TV5)** |
+| **FR-07** | **US-07 / UC-06**: Quản lý Vòng đời & Trạng thái Đơn hàng (State Machine) | • `state-order.puml`<br>• `sequence-order-tracking.puml` | • `order-state-machine.ts`<br>• `assertTransition()`<br>• `PATCH /orders/:id/status` | • Test State Machine (Tiêu chí a trong `task10.spec.ts`) | Minh (TV6) |
+| **FR-08** | **US-08 / UC-04**: Khuyến mãi & Mã giảm giá (Coupons) | • `sequence-order-create.puml`<br>• `class-domain.puml` | • `dto.couponCode`<br>• Logic giảm giá (`BREWLITE10`, `GIAM10K`) | • Unit test Coupon validation<br>• `checkout-e2e.spec.ts` | An (TV4) |
+| **FR-09** | **US-09 / UC-05**: Thanh toán Idempotent & Tích lũy Điểm thưởng (Loyalty) | • `sequence-checkout.puml`<br>• `activity-payment.puml`<br>• `ADR 003` | • Header `Idempotency-Key`<br>• Ràng buộc `@unique idempotencyKey`<br>• `user.loyaltyPoints` (+1 điểm/10k) | • Test Idempotency (Tiêu chí b trong `task10.spec.ts`)<br>• `checkout-e2e.spec.ts` | **San (TV5)** |
+| **FR-10** | **US-10 / UC-06**: Theo dõi & Lịch sử Đơn hàng cá nhân | • `sequence-order-tracking.puml`<br>• `deployment-production.puml` | • `GET /orders/me`<br>• `apps/web/src/app/orders/page.tsx`<br>• `apps/web/src/app/orders/[id]/page.tsx` | • Component test Order history<br>• E2E: `checkout-e2e.spec.ts` (Chặng 5) | Minh (TV6) |
+
+---
+
+## Bảng Ma trận Truy vết Yêu cầu Phi Chức năng (Non-Functional Requirements - NFR)
+
+| Mã Yêu Cầu | Nhóm Yêu Cầu | Tiêu chí Kỹ thuật | Giải pháp Thực thi | Minh chứng & Kiểm thử |
+| :---: | :--- | :--- | :--- | :--- |
+| **NFR-01** | **Hiệu năng & Khả năng chịu tải** | Phản hồi API < 500ms; không bán âm tồn kho khi nhiều khách mua đồng thời. | Dùng Optimistic Locking và Index B-tree trên PostgreSQL. | Test Concurrency tại `task10.spec.ts` (bắn 2 request cùng lúc thành công xử lý 1). |
+| **NFR-02** | **Bảo mật & Toàn vẹn** | Mật khẩu băm an toàn, bảo vệ route bằng JWT, không lộ secret trên Git. | Bcrypt salt rounds = 10, Passport JWT Guard, `.env` nằm trong `.gitignore`. | Kiểm thử JwtAuthGuard từ chối truy cập khi không có token; Quét git không có secret. |
+| **NFR-03** | **Khả năng Giám sát (Observability)** | Có cơ chế tự động kiểm tra sức khỏe hệ thống và đo độ trễ CSDL. | Endpoint `GET /health` trả về trạng thái kết nối PostgreSQL. | Test `health.controller.spec.ts` và Smoke Test trong GitHub Actions CI/CD. |
+| **NFR-04** | **Khả năng Triển khai (Deployability)** | Tự động hóa build, test và deploy qua container độc lập. | Dockerfile đa tầng, `docker-compose.yml`, GitHub Actions workflow `.github/workflows/cd.yml`. | Pipeline CI/CD báo xanh; chạy thành công cả 3 service qua `docker-compose up`. |

@@ -1,78 +1,21 @@
-name: CD
+name: BrewLite CD Pipeline (Sprint 2 Blueprint)
 
 on:
   push:
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  packages: write
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  quality-gate:
-    name: Verify Quality Gate
+  deploy-production:
+    name: Build Docker Images and Deploy
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Check Web
-        run: |
-          cd apps/web
-          npm ci
-          npm run lint
-          npm test
-          npm run build
-      - name: Check API
-        run: |
-          cd apps/api
-          npm ci
-          npm run lint
-          npm test
-          npm run build
+    if: github.ref_type == 'tag'
 
-  build-and-push:
-    name: Build & Push Images (GHCR)
-    needs: quality-gate
-    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Log in to Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build Web Image
-        run: |
-          echo "Building Web image with tag: ${{ env.IMAGE_TAG }}"
-          # docker build -t ${{ env.REGISTRY }}/${{ github.repository }}/web:${{ env.IMAGE_TAG }} ./apps/web
-      - name: Build API Image
-        run: |
-          echo "Building API image with tag: ${{ env.IMAGE_TAG }}"
-          # docker build -t ${{ env.REGISTRY }}/${{ github.repository }}/api:${{ env.IMAGE_TAG }} ./apps/api
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-  deploy:
-    name: Deploy to Production VPS
-    needs: build-and-push
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy via SSH
+      - name: Build Docker Compose Stack
         run: |
-          echo "Connecting to DEPLOY_HOST via SSH"
-          echo "Pulling images tagged ${{ env.IMAGE_TAG }}"
-          echo "Executing zero-downtime rolling restart"
-      - name: Smoke Test
-        run: |
-          echo "Performing smoke tests on production endpoints"
-          # curl --fail --silent --show-error "${{ secrets.PRODUCTION_FRONTEND_URL }}"
-          # curl --fail --silent --show-error "${{ secrets.PRODUCTION_API_HEALTH_URL }}"
+          docker compose build
+          echo "Production containers built successfully."

@@ -1,18 +1,25 @@
-# Build stage
-FROM node:22-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+FROM node:22-bookworm-slim
 
-# Production runtime stage
-FROM node:22-alpine AS runner
+# Cài đặt OpenSSL cho Prisma
+RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-ENV NODE_ENV=production
-COPY package*.json ./
-RUN npm ci --only=production
-COPY --from=builder /app/dist ./dist
+
+COPY package.json ./
+COPY prisma ./prisma/
+
+# Cài đặt dependencies
+RUN npm install --legacy-peer-deps
+
+# Sinh Prisma Client cho môi trường Linux
+RUN npx prisma generate
+
+COPY . .
+
+# Đảm bảo clean build và biên dịch ứng dụng NestJS
+RUN rm -f *.tsbuildinfo && rm -rf dist && npm run build
 
 EXPOSE 3001
-CMD ["node", "dist/main"]
+
+# Đẩy schema vào DB, nạp seed dữ liệu mẫu và chạy server
+CMD npx prisma db push --accept-data-loss && npx ts-node prisma/seed.ts && (node dist/main.js || node dist/src/main.js || npm run start:prod)
